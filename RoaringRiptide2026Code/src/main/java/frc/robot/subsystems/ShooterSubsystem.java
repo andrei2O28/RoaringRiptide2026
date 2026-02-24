@@ -143,18 +143,19 @@ public class ShooterSubsystem extends SubsystemBase {
    * the desired speed it starts the Feeder.
    */
   public Command runShooterCommand() {
-    return this.startEnd(
-      () -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm),
-      () -> flywheelMotor.stopMotor()
-    ).until(isFlywheelSpinning).andThen(
+    return Commands.sequence(
+      this.runOnce(() -> setFlywheelVelocity(FlywheelSetpoints.kShootRpm)),
+      Commands.waitUntil(isFlywheelSpinning),
       this.startEnd(
         () -> {
-          this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
-          this.setFeederPower(FeederSetpoints.kFeed);
-        }, () -> {
+          setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+          setFeederPower(FeederSetpoints.kFeed);
+        },
+        () -> {
           flywheelMotor.stopMotor();
           feederMotor.stopMotor();
-        })
+        }
+      )
     ).withName("Shooting");
   }
 
