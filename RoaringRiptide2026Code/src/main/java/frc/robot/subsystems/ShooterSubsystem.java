@@ -144,20 +144,20 @@ public class ShooterSubsystem extends SubsystemBase {
    */
   public Command runShooterCommand() {
     return Commands.sequence(
-      this.runOnce(() -> setFlywheelVelocity(FlywheelSetpoints.kShootRpm)),
-      Commands.waitUntil(isFlywheelSpinning),
-      this.startEnd(
-        () -> {
-          setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
-          setFeederPower(FeederSetpoints.kFeed);
-        },
-        () -> {
-          flywheelMotor.stopMotor();
-          feederMotor.stopMotor();
-        }
-      )
+        this.runOnce(() -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm)),
+        Commands.waitUntil(isFlywheelSpinning),
+        this.startEnd(
+            () -> {
+                this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+                this.setFeederPower(FeederSetpoints.kFeed);
+            },
+            () -> {
+                this.setFlywheelVelocity(0.0);
+                this.setFeederPower(0.0);
+            }
+        )
     ).withName("Shooting");
-  }
+}
 
   @Override
   public void periodic() {
