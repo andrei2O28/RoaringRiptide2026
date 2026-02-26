@@ -94,7 +94,9 @@ public class RobotContainer {
       .whileTrue(m_intake.runExtakeCommand());
 
     // Y Button -> Run intake and run the shooter flywheel and feeder
-    m_driverController.y().toggleOnTrue(m_shooter.runShooterCommand().alongWith(m_intake.runIntakeCommand()));
+    m_driverController.y().toggleOnTrue(m_shooter.runShooterCommand()
+    .alongWith(m_intake.runFeederCommand())
+    .alongWith(m_intake.runIntakeCommand()));
   }
 
   /**
