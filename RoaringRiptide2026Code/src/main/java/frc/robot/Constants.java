@@ -20,8 +20,8 @@ import edu.wpi.first.math.util.Units;
 public final class Constants {
 
   public static final class IntakeSubsystemConstants {
-    public static final int kIntakeMotorCanId = 31;    // SPARK Flex CAN ID
-    public static final int kConveyorMotorCanId = 41;  // SPARK Flex CAN ID
+    public static final int kIntakeMotorCanId = 2;    // SPARK Flex CAN ID
+    public static final int kConveyorMotorCanId = 4;  // SPARK Flex CAN ID
 
     public static final class IntakeSetpoints {
       public static final double kIntake = 0.6;
@@ -35,9 +35,9 @@ public final class Constants {
   }
 
   public static final class ShooterSubsystemConstants {
-    public static final int kFeederMotorCanId = 51;    // SPARK Flex CAN ID
-    public static final int kFlywheelMotorCanId = 52;  // SPARK Flex CAN ID (Right)
-    public static final int kFlywheelFollowerMotorCanId = 53;  // SPARK Flex CAN ID (Left)
+    public static final int kFeederMotorCanId = 5;    // SPARK Flex CAN ID
+    public static final int kFlywheelMotorCanId = 6;  // SPARK Flex CAN ID (Right)
+    public static final int kFlywheelFollowerMotorCanId = 7;  // SPARK Flex CAN ID (Left)
 
     public static final class FeederSetpoints {
       public static final double kFeed = 0.95;
