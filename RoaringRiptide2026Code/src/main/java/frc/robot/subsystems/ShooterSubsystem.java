@@ -143,21 +143,20 @@ public class ShooterSubsystem extends SubsystemBase {
    * the desired speed it starts the Feeder.
    */
   public Command runShooterCommand() {
-    return Commands.sequence(
-        this.runOnce(() -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm)),
-        Commands.waitUntil(isFlywheelSpinning),
-        this.startEnd(
-            () -> {
-                this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
-                this.setFeederPower(FeederSetpoints.kFeed);
-            },
-            () -> {
-                this.setFlywheelVelocity(0.0);
-                this.setFeederPower(0.0);
-            }
-        )
+    return this.startEnd(
+      () -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm),
+      () -> flywheelMotor.stopMotor()
+    ).until(isFlywheelSpinning).andThen(
+      this.startEnd(
+        () -> {
+          this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+          this.setFeederPower(FeederSetpoints.kFeed);
+        }, () -> {
+          flywheelMotor.stopMotor();
+          feederMotor.stopMotor();
+        })
     ).withName("Shooting");
-}
+  }
 
   @Override
   public void periodic() {
