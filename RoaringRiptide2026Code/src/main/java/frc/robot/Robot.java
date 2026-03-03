@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.LimelightHelpers;
+import edu.wpi.first.cameraserver;
+import edu.wpi.first.cameraserver.CameraServer;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -119,4 +121,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void simulationPeriodic() {}
+
+  @Override
+  public void robotInit() {
+    CameraServer.startAutomaticCapture();
+  }
 }
