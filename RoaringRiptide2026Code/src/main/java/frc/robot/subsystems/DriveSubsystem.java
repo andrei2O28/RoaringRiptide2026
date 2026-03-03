@@ -11,6 +11,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -41,6 +44,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   // The gyro sensor
   private final Pigeon2 pidgey = new Pigeon2(20, "rio");
+
+  private final Field2d field2d = new Field2d();
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry =
@@ -83,6 +88,10 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
         });
+    
+    // Adding field map to the smart dashboard
+    field2d.setRobotPose(m_odometry.getPoseMeters());
+    SmartDashboard.putData(field2d);
   }
 
   /**
