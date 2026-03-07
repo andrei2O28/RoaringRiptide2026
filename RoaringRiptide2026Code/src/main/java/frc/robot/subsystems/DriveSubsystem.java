@@ -15,10 +15,15 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.sim.TalonFXSimState.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
+
+import frc.robot.LimelightHelpers;
+import frc.robot.Constants.VisionConstants;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -46,6 +51,17 @@ public class DriveSubsystem extends SubsystemBase {
   private final Pigeon2 pidgey = new Pigeon2(20, "rio");
 
   private final Field2d field2d = new Field2d();
+
+  private boolean tooCloseToHub() {
+    var tags = LimelightHelpers.getRawFiducials(VisionConstants.kLimelightName);
+
+    if (tags.length == 0) {
+      return false;
+    }
+
+    double distance = tags[0].distToRobot;
+    return distance <= VisionConstants.kMinHubDistanceInches;
+  }
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry =
@@ -92,6 +108,11 @@ public class DriveSubsystem extends SubsystemBase {
     // Adding field map to the smart dashboard
     field2d.setRobotPose(m_odometry.getPoseMeters());
     SmartDashboard.putData(field2d);
+
+    SmartDashboard.putNumber("FL Turning burnt", m_frontLeft.m_turningSpark.getOutputCurrent());
+    SmartDashboard.putNumber("FL Turning healthy", m_frontRight.m_turningSpark.getOutputCurrent());
+
+    SmartDashboard.putBoolean("Too Close To Hub", tooCloseToHub());
   }
 
   /**
@@ -129,10 +150,16 @@ public class DriveSubsystem extends SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+
+    if (tooCloseToHub() && xSpeed > 0) {
+          xSpeed = 0;
+    }
     // Convert the commanded speeds into the correct units for the drivetrain
     double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
+
+    
 
     var swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(

@@ -10,7 +10,9 @@ import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Configs;
+import frc.robot.LimelightHelpers;
 import frc.robot.Constants.LauncherSubsystemConstants.FeederSetpoints;
 import frc.robot.Constants.LauncherSubsystemConstants.FlywheelSetpoints;
 import frc.robot.Constants.LauncherSubsystemConstants;
@@ -26,6 +29,7 @@ public class LauncherSubsystem extends SubsystemBase {
   
   // Initialize flywheel SPARKs. We will use MAXMotion velocity control for the flywheel, so we also need to
   // initialize the closed loop controllers and encoders.
+  
   private SparkFlex flywheelMotor =
       new SparkFlex(LauncherSubsystemConstants.kFlywheelMotorCanId, MotorType.kBrushless);
   private SparkClosedLoopController flywheelController = flywheelMotor.getClosedLoopController();
@@ -92,6 +96,41 @@ public class LauncherSubsystem extends SubsystemBase {
   (
     () -> isFlywheelAt(FlywheelSetpoints.kLaunchRpm)
   );
+
+  public boolean isAlignedWithTarget() {
+    if (!LimelightHelpers.getTV("limelight-april")) {
+      return false;
+    }
+    double tx = LimelightHelpers.getTX("limelight-april"); //Horizontal error
+    double tagID = LimelightHelpers.getFiducialID("limelight-april"); //retrieving tag id 
+    //(since there are multiple april tags, we will lock on to a few selective ones)
+
+    boolean correctTagID = tagID == 10 || tagID == 25;//confirm locking on to correct tag
+
+    return correctTagID && Math.abs(tx) < 3.0; // 3 degree tolerance
+  }
+
+  public void setDynamicFlywheelRPM() {
+    double rpm = getDistance();
+    setFlywheelVelocity(rpm);
+  }
+
+  public double getDistance() {
+
+    if (!LimelightHelpers.getTV("limelight-april")) {
+        return FlywheelSetpoints.kLaunchRpm; // fallback RPM
+    }
+
+    var tags = LimelightHelpers.getRawFiducials("limelight-april");
+
+    if (tags.length == 0) {
+        return FlywheelSetpoints.kLaunchRpm;
+    }
+
+    double distance = (39.37008 * tags[0].distToRobot); // inches
+
+    return distance;
+  }
   /** 
    * Trigger: Is the flywheel stopped?
    */
@@ -175,6 +214,10 @@ public class LauncherSubsystem extends SubsystemBase {
 
     SmartDashboard.putBoolean("Is Flywheel Spinning", isFlywheelSpinning.getAsBoolean());
     SmartDashboard.putBoolean("Is Flywheel Stopped", isFlywheelStopped.getAsBoolean());
-  }
 
+    SmartDashboard.putBoolean("Is Launcher Ready", isAlignedWithTarget());
+
+    double distanceFromHubAprilTag = getDistance();
+    SmartDashboard.putNumber("Distance in inches from front of hub", distanceFromHubAprilTag);
+  }
 }

@@ -14,9 +14,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Autos;
 import frc.robot.Constants.OIConstants;
+import frc.robot.LimelightHelpers.LimelightTarget_Barcode;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
+import frc.robot.LimelightHelpers;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -30,6 +32,7 @@ public class RobotContainer {
   private final IntakeSubsystem m_intake = new IntakeSubsystem();
   private final LauncherSubsystem m_launcher = new LauncherSubsystem();
 
+  
   // The driver's controller
   private final CommandXboxController m_driverController =
       new CommandXboxController(OIConstants.kDriverControllerPort);
@@ -65,7 +68,7 @@ public class RobotContainer {
     SmartDashboard.putNumber("Bat Voltage", RobotController.getBatteryVoltage());
 
     SmartDashboard.putData("Intake", m_intake.runIntakeCommand().withName("Intake - Intaking"));
-    SmartDashboard.putData("Outtake", m_intake.runOuttakeCommand().withName("Intake - Extaking"));
+    SmartDashboard.putData("Outtake", m_intake.runOuttakeCommand().withName("Intake - Outtaking"));
 
     SmartDashboard.putData("Feeder", m_launcher.runFeederCommand().withName("Launcher - Feeding and Launching"));
     SmartDashboard.putData("Flywheel", m_launcher.runFlywheelCommand().withName("Launcher - Spinning up Flywheel"));
@@ -84,7 +87,7 @@ public class RobotContainer {
     // xbox controller 🎮
     // Left Stick Button -> Set swerve to X
     m_driverController.leftStick().whileTrue(m_robotDrive.setXCommand());
-
+    
     // Start Button -> Zero swerve heading
     // needs to become button board
 
@@ -104,7 +107,9 @@ public class RobotContainer {
     m_buttonBoard.button(5).toggleOnTrue(m_intake.runIntakeCommand());
     
     // full launching mechanism (conveyor + launcher) (old L2 button)
-    m_buttonBoard.button(3).toggleOnTrue(m_launcher.runLauncherCommand().alongWith(m_intake.runIntakeCommand()));
+    m_buttonBoard.button(3)
+    .toggleOnTrue(m_launcher.runLauncherCommand()
+    .alongWith(m_intake.runConveyorCommand()));
     
     // outtake + reverse conveyor to feed or for other purposes (old L3 button)
     m_buttonBoard.button(4).toggleOnTrue(m_intake.runOuttakeCommand());

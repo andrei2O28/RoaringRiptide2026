@@ -34,6 +34,11 @@ public final class Constants {
     }
   }
 
+  public static final class VisionConstants {
+    public static final String kLimelightName = "limelight-april";
+    public static final double kMinHubDistanceInches = 50.5/39.37008;
+  }
+
   public static final class LauncherSubsystemConstants {
     public static final int kFeederMotorCanId = 51;    // SPARK Flex CAN ID
     public static final int kFlywheelMotorCanId = 53;  // SPARK Flex CAN ID (Right)

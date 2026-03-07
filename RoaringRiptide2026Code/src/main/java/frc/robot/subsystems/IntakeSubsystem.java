@@ -76,6 +76,15 @@ public class IntakeSubsystem extends SubsystemBase {
         }).withName("Intaking");
   }
 
+  public Command runConveyorCommand() {
+    return this.startEnd(
+        () -> {
+          this.setConveyorPower(ConveyorSetpoints.kIntake);
+        }, () -> {
+          this.setConveyorPower(0.0);
+        }).withName("Feeding");
+  }
+
   /**
    * Command to reverse the intake motor and coveyor motors. When the command is interrupted, e.g. the button is
    * released, the motors will stop.
