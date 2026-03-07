@@ -102,7 +102,7 @@ public final class Configs {
     }
   }
 
-  public static final class ShooterSubsystem {
+  public static final class LauncherSubsystem {
     public static final SparkFlexConfig flywheelConfig = new SparkFlexConfig();
     public static final SparkFlexConfig flywheelFollowerConfig = new SparkFlexConfig();
     public static final SparkFlexConfig feederConfig = new SparkFlexConfig();
@@ -141,7 +141,7 @@ public final class Configs {
 
       // Configure the follower flywheel motor to follow the main flywheel motor
       flywheelFollowerConfig.apply(flywheelConfig)
-        .follow(Constants.ShooterSubsystemConstants.kFlywheelMotorCanId, true);
+        .follow(Constants.LauncherSubsystemConstants.kFlywheelMotorCanId, true);
 
       // Configure basic setting of the feeder motor
       feederConfig

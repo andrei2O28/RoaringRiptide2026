@@ -18,16 +18,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Configs;
-import frc.robot.Constants.ShooterSubsystemConstants.FeederSetpoints;
-import frc.robot.Constants.ShooterSubsystemConstants.FlywheelSetpoints;
-import frc.robot.Constants.ShooterSubsystemConstants;
+import frc.robot.Constants.LauncherSubsystemConstants.FeederSetpoints;
+import frc.robot.Constants.LauncherSubsystemConstants.FlywheelSetpoints;
+import frc.robot.Constants.LauncherSubsystemConstants;
 
-public class ShooterSubsystem extends SubsystemBase {
+public class LauncherSubsystem extends SubsystemBase {
   
   // Initialize flywheel SPARKs. We will use MAXMotion velocity control for the flywheel, so we also need to
   // initialize the closed loop controllers and encoders.
   private SparkFlex flywheelMotor =
-      new SparkFlex(ShooterSubsystemConstants.kFlywheelMotorCanId, MotorType.kBrushless);
+      new SparkFlex(LauncherSubsystemConstants.kFlywheelMotorCanId, MotorType.kBrushless);
   private SparkClosedLoopController flywheelController = flywheelMotor.getClosedLoopController();
   private RelativeEncoder flywheelEncoder = flywheelMotor.getEncoder();
 
@@ -35,10 +35,10 @@ public class ShooterSubsystem extends SubsystemBase {
   // controller like above.
 
   private SparkFlex feederMotor =
-      new SparkFlex(ShooterSubsystemConstants.kFeederMotorCanId, MotorType.kBrushless);
+      new SparkFlex(LauncherSubsystemConstants.kFeederMotorCanId, MotorType.kBrushless);
       
   private SparkFlex flywheelFollowerMotor =
-      new SparkFlex(ShooterSubsystemConstants.kFlywheelFollowerMotorCanId, MotorType.kBrushless);
+      new SparkFlex(LauncherSubsystemConstants.kFlywheelFollowerMotorCanId, MotorType.kBrushless);
   private RelativeEncoder feederEncoder = feederMotor.getEncoder();
 
   
@@ -46,8 +46,8 @@ public class ShooterSubsystem extends SubsystemBase {
   // Member variables for subsystem state management
   private double flywheelTargetVelocity = 0.0;
 
-  /** Creates a new ShooterSubsystem. */
-  public ShooterSubsystem() {
+  /** Creates a new LauncherSubsystem. */
+  public LauncherSubsystem() {
     /*
      * Apply the appropriate configurations to the SPARKs.
      *
@@ -59,22 +59,22 @@ public class ShooterSubsystem extends SubsystemBase {
      * mid-operation.
      */
     flywheelMotor.configure(
-        Configs.ShooterSubsystem.flywheelConfig,
+        Configs.LauncherSubsystem.flywheelConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
     flywheelFollowerMotor.configure(
-        Configs.ShooterSubsystem.flywheelFollowerConfig,
+        Configs.LauncherSubsystem.flywheelFollowerConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
     feederMotor.configure(
-        Configs.ShooterSubsystem.feederConfig,
+        Configs.LauncherSubsystem.feederConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
     // Zero flywheel encoder on initialization
     flywheelEncoder.setPosition(0);
 
-    System.out.println("---> ShooterSubsystem initialized");
+    System.out.println("---> LauncherSubsystem initialized");
   }
 
   private boolean isFlywheelAt(double velocity) {
@@ -82,24 +82,15 @@ public class ShooterSubsystem extends SubsystemBase {
             velocity, FlywheelSetpoints.kVelocityTolerance);
   }
 
-  /** 
-   * Trigger: Is the flywheel spinning at the required velocity?
-   */
-  // public final Trigger isFlywheelSpinning = new Trigger(
-  //    () -> isFlywheelAt(5000) || flywheelEncoder.getVelocity() > 5000
-  // );
-
-  // public final Trigger isFlywheelSpinningBackwards = new Trigger(
-  //     () -> isFlywheelAt(-5000) || flywheelEncoder.getVelocity() < -5000
-  // );
+  // Trigger: Is the flywheel spinning at the required velocity?
 
   public final Trigger isFlywheelSpinningBackwards = new Trigger(
-      () -> isFlywheelAt(-FlywheelSetpoints.kShootRpm)
+      () -> isFlywheelAt(-FlywheelSetpoints.kLaunchRpm)
   );
 
   public final Trigger isFlywheelSpinning = new Trigger
   (
-    () -> isFlywheelAt(FlywheelSetpoints.kShootRpm)
+    () -> isFlywheelAt(FlywheelSetpoints.kLaunchRpm)
   );
   /** 
    * Trigger: Is the flywheel stopped?
@@ -128,7 +119,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command runFlywheelCommand() {
     return this.startEnd(
         () -> {
-          this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+          this.setFlywheelVelocity(FlywheelSetpoints.kLaunchRpm);
         },
         () -> {
           this.setFlywheelVelocity(0.0);
@@ -142,7 +133,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command runFeederCommand() {
     return this.startEnd(
         () -> {
-          this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+          this.setFlywheelVelocity(FlywheelSetpoints.kLaunchRpm);
           this.setFeederPower(FeederSetpoints.kFeed);
         }, () -> {
           this.setFlywheelVelocity(0.0);
@@ -151,35 +142,35 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   /**
-   * Meta-command to operate the shooter. The Flywheel starts spinning up and when it reaches
+   * Meta-command to operate the Launcher. The Flywheel starts spinning up and when it reaches
    * the desired speed it starts the Feeder.
    */
-  public Command runShooterCommand() {
+  public Command runLauncherCommand() {
     return this.startEnd(
-      () -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm),
+      () -> this.setFlywheelVelocity(FlywheelSetpoints.kLaunchRpm),
       () -> flywheelMotor.stopMotor()).until(isFlywheelSpinning).andThen(
       this.startEnd(
         () -> {
-          this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+          this.setFlywheelVelocity(FlywheelSetpoints.kLaunchRpm);
           this.setFeederPower(FeederSetpoints.kFeed);
         }, () -> {
           flywheelMotor.stopMotor();
           feederMotor.stopMotor();
         })
-    ).withName("Shooting");
+    ).withName("Launching");
   }
 
   @Override
   public void periodic() {
     // Display subsystem values
-    SmartDashboard.putNumber("Shooter | Feeder | Applied Output", feederMotor.getAppliedOutput());
-    SmartDashboard.putNumber("Shooter | Flywheel | Applied Output", flywheelMotor.getAppliedOutput());
-    SmartDashboard.putNumber("Shooter | Flywheel | Current", flywheelMotor.getOutputCurrent());
-    SmartDashboard.putNumber("Shooter | Flywheel Follower | Applied Output", flywheelFollowerMotor.getAppliedOutput());
-    SmartDashboard.putNumber("Shooter | Flywheel Follower | Current", flywheelFollowerMotor.getOutputCurrent());
+    SmartDashboard.putNumber("Launcher | Feeder | Applied Output", feederMotor.getAppliedOutput());
+    SmartDashboard.putNumber("Launcher | Flywheel | Applied Output", flywheelMotor.getAppliedOutput());
+    SmartDashboard.putNumber("Launcher | Flywheel | Current", flywheelMotor.getOutputCurrent());
+    SmartDashboard.putNumber("Launcher | Flywheel Follower | Applied Output", flywheelFollowerMotor.getAppliedOutput());
+    SmartDashboard.putNumber("Launcher | Flywheel Follower | Current", flywheelFollowerMotor.getOutputCurrent());
 
-    SmartDashboard.putNumber("Shooter | Flywheel | Target Velocity", flywheelTargetVelocity);
-    SmartDashboard.putNumber("Shooter | Flywheel | Actual Velocity", flywheelEncoder.getVelocity());
+    SmartDashboard.putNumber("Launcher | Flywheel | Target Velocity", flywheelTargetVelocity);
+    SmartDashboard.putNumber("Launcher | Flywheel | Actual Velocity", flywheelEncoder.getVelocity());
     SmartDashboard.putNumber("Feeder | Flywheel | Actual Velocity", feederEncoder.getVelocity());
 
     SmartDashboard.putBoolean("Is Flywheel Spinning", isFlywheelSpinning.getAsBoolean());

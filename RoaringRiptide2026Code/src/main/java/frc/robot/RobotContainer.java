@@ -9,13 +9,14 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Autos;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.LauncherSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -27,11 +28,14 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final IntakeSubsystem m_intake = new IntakeSubsystem();
-  private final ShooterSubsystem m_shooter = new ShooterSubsystem();
+  private final LauncherSubsystem m_launcher = new LauncherSubsystem();
 
   // The driver's controller
   private final CommandXboxController m_driverController =
       new CommandXboxController(OIConstants.kDriverControllerPort);
+  // The operator's button board
+  private final CommandGenericHID m_buttonBoard = 
+      new CommandGenericHID(OIConstants.kButtonBoardPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -56,15 +60,15 @@ public class RobotContainer {
             m_robotDrive).withName("Robot Drive Default"));
 
     SmartDashboard.putData(m_intake);
-    SmartDashboard.putData(m_shooter);
+    SmartDashboard.putData(m_launcher);
 
     SmartDashboard.putNumber("Bat Voltage", RobotController.getBatteryVoltage());
 
     SmartDashboard.putData("Intake", m_intake.runIntakeCommand().withName("Intake - Intaking"));
-    SmartDashboard.putData("Extake", m_intake.runExtakeCommand().withName("Intake - Extaking"));
+    SmartDashboard.putData("Outtake", m_intake.runOuttakeCommand().withName("Intake - Extaking"));
 
-    SmartDashboard.putData("Feeder", m_shooter.runFeederCommand().withName("Shooter - Feeding and Shooting"));
-    SmartDashboard.putData("Flywheel", m_shooter.runFlywheelCommand().withName("Shooter - Spinning up Flywheel"));
+    SmartDashboard.putData("Feeder", m_launcher.runFeederCommand().withName("Launcher - Feeding and Launching"));
+    SmartDashboard.putData("Flywheel", m_launcher.runFlywheelCommand().withName("Launcher - Spinning up Flywheel"));
   }
 
   /**
@@ -77,27 +81,39 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    // xbox controller 🎮
     // Left Stick Button -> Set swerve to X
     m_driverController.leftStick().whileTrue(m_robotDrive.setXCommand());
 
     // Start Button -> Zero swerve heading
-    m_driverController.start().onTrue(m_robotDrive.zeroHeadingCommand());
+    // needs to become button board
 
     // Right Trigger -> Run fuel intake in reverse
-    m_driverController
-      .rightTrigger(OIConstants.kTriggerButtonThreshold)
-      .whileTrue(m_intake.runIntakeCommand());
+    // m_driverController
+    //   .rightTrigger(OIConstants.kTriggerButtonThreshold)
+    //   .whileTrue(m_intake.runIntakeCommand());
 
     // Left Trigger -> Run fuel intake in reverse
-    m_driverController
-      .leftTrigger(OIConstants.kTriggerButtonThreshold)
-      .whileTrue(m_intake.runExtakeCommand());
+    // m_driverController
+    //   .leftTrigger(OIConstants.kTriggerButtonThreshold)
+    //   .whileTrue(m_intake.runOuttakeCommand());
 
-    // Y Button -> Run intake and run the shooter flywheel and feeder
-    m_driverController.y().toggleOnTrue(m_shooter.runShooterCommand().alongWith(m_intake.runIntakeCommand()));
-    // m_driverController.y().toggleOnTrue(m_shooter.runShooterCommand());
-    m_driverController.a().toggleOnTrue(m_shooter.runFeederCommand());
+    // button board 😀
+    
+    // intake + conveyor to intake fuel efficiently (old L1 button)
+    m_buttonBoard.button(5).toggleOnTrue(m_intake.runIntakeCommand());
+    
+    // full launching mechanism (conveyor + launcher) (old L2 button)
+    m_buttonBoard.button(3).toggleOnTrue(m_launcher.runLauncherCommand().alongWith(m_intake.runIntakeCommand()));
+    
+    // outtake + reverse conveyor to feed or for other purposes (old L3 button)
+    m_buttonBoard.button(4).toggleOnTrue(m_intake.runOuttakeCommand());
+    
+    // just feeder motor, mainly for debugging (old L4 button)
+    m_buttonBoard.button(6).toggleOnTrue(m_launcher.runFeederCommand());
 
+    // Zero swerve heading (makes robot think where it is facing is the front) (old zero button)
+    m_buttonBoard.button(9).onTrue(m_robotDrive.zeroHeadingCommand());
   }
 
   /**
