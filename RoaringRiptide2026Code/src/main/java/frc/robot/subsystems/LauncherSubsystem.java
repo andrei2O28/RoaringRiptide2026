@@ -105,18 +105,17 @@ public class LauncherSubsystem extends SubsystemBase {
     double tagID = LimelightHelpers.getFiducialID("limelight-april"); //retrieving tag id 
     //(since there are multiple april tags, we will lock on to a few selective ones)
 
-    boolean correctTagID = tagID == 10 || tagID == 25;//confirm locking on to correct tag
+    boolean correctTagID = tagID == 10 || tagID == 26; //confirm locking on to correct tag
 
     return correctTagID && Math.abs(tx) < 3.0; // 3 degree tolerance
   }
 
   public void setDynamicFlywheelRPM() {
-    double rpm = getDistance();
+    double rpm = getDistanceFromHubAprilTag();
     setFlywheelVelocity(rpm);
   }
 
-  public double getDistance() {
-
+ public double getDistanceFromHubAprilTag() {
     if (!LimelightHelpers.getTV("limelight-april")) {
         return FlywheelSetpoints.kLaunchRpm; // fallback RPM
     }
@@ -127,10 +126,15 @@ public class LauncherSubsystem extends SubsystemBase {
         return FlywheelSetpoints.kLaunchRpm;
     }
 
+    // Only use distance if we see tag 10 or 26
+    if (tags[0].id != 10 && tags[0].id != 26) {
+        return FlywheelSetpoints.kLaunchRpm; // fallback RPM
+    }
+
     double distance = (39.37008 * tags[0].distToRobot); // inches
 
     return distance;
-  }
+}
   /** 
    * Trigger: Is the flywheel stopped?
    */
@@ -217,7 +221,7 @@ public class LauncherSubsystem extends SubsystemBase {
 
     SmartDashboard.putBoolean("Is Launcher Ready", isAlignedWithTarget());
 
-    double distanceFromHubAprilTag = getDistance();
+    double distanceFromHubAprilTag = getDistanceFromHubAprilTag();
     SmartDashboard.putNumber("Distance in inches from front of hub", distanceFromHubAprilTag);
   }
 }
