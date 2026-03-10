@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.config.RobotConfig;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -52,6 +54,7 @@ public final class Constants {
       public static final double kLaunchRpm = 5000;
       public static final double kVelocityTolerance = 100;
     }
+
   }
 
   public static final class DriveConstants {
@@ -141,6 +144,17 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
         new TrapezoidProfile.Constraints(
             kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+  }
+
+  public static final class PathPlannerConstants {
+      public static RobotConfig kRobotConfig;
+      static {
+        try {
+          kRobotConfig = RobotConfig.fromGUISettings();
+        } catch (Exception e) {
+          e.printStackTrace();
+      }
+    }
   }
 
 }

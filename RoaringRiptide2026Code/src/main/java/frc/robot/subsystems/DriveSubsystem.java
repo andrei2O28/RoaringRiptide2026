@@ -11,15 +11,23 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.sim.TalonFXSimState.MotorType;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.revrobotics.spark.SparkMax;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import com.pathplanner.lib.config.RobotConfig;
+import frc.robot.Constants.PathPlannerConstants;
 import frc.robot.Constants.DriveConstants;
 
 import frc.robot.LimelightHelpers;
@@ -79,8 +87,8 @@ public class DriveSubsystem extends SubsystemBase {
   public DriveSubsystem() {
 
     // Apply default configuration
-    Pigeon2Configuration config = new Pigeon2Configuration();
-    pidgey.getConfigurator().apply(config);
+    Pigeon2Configuration pigeonConfig = new Pigeon2Configuration();
+    pidgey.getConfigurator().apply(pigeonConfig);
 
     // Set signal update rates (important for CAN optimization)
     pidgey.getYaw().setUpdateFrequency(100);              // 100 Hz for odometry
@@ -91,7 +99,40 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Zero heading at startup
     pidgey.setYaw(0);
+
+    RobotConfig config;
+    try{
+      config = RobotConfig.fromGUISettings();
+    } catch (Exception e) {
+      // Handle exception as needed
+      e.printStackTrace();
     }
+
+    // Configure AutoBuilder last
+    AutoBuilder.configure(
+            this::getPose, // Robot pose supplier
+            this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+            this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+            new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+            ),
+            Constants.PathPlannerConstants.kRobotConfig, // The robot configuration
+            () -> {
+              // Boolean supplier that controls when the path will be mirrored for the red alliance
+              // This will flip the path being followed to the red side of the field.
+              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+            },
+            this // Reference to this subsystem to set requirements
+    );
+  }
 
   @Override
   public void periodic() {
@@ -141,6 +182,10 @@ public class DriveSubsystem extends SubsystemBase {
         pose);
   }
 
+  public void resetPose(Pose2d pose) {
+    resetOdometry(pose);
+  }
+
   /**
    * Method to drive the robot using joystick info.
    *
@@ -179,6 +224,30 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
   }
+
+  /**
+ * Drives the robot using robot-relative chassis speeds (used by PathPlanner AutoBuilder).
+ *
+ * @param speeds The desired ChassisSpeeds (robot-relative).
+ */
+public void driveRobotRelative(ChassisSpeeds speeds) {
+  var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
+  SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+
+  m_frontLeft.setDesiredState(swerveModuleStates[0]);
+  m_frontRight.setDesiredState(swerveModuleStates[1]);
+  m_rearLeft.setDesiredState(swerveModuleStates[2]);
+  m_rearRight.setDesiredState(swerveModuleStates[3]);
+}
+
+public ChassisSpeeds getRobotRelativeSpeeds() {
+  return DriveConstants.kDriveKinematics.toChassisSpeeds(
+    m_frontLeft.getState(),
+    m_frontRight.getState(),
+    m_rearLeft.getState(),
+    m_rearRight.getState()
+  );
+}
 
   /** Sets the wheels into an X formation to prevent movement. */
   public Command setXCommand() {
@@ -236,4 +305,5 @@ public class DriveSubsystem extends SubsystemBase {
     return pidgey.getAngularVelocityZWorld().getValueAsDouble()
         * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
+  
 }

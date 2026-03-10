@@ -4,8 +4,12 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -32,7 +36,8 @@ public class RobotContainer {
   private final IntakeSubsystem m_intake = new IntakeSubsystem();
   private final LauncherSubsystem m_launcher = new LauncherSubsystem();
 
-  
+  private final SendableChooser<Command> autoChooser;
+
   // The driver's controller
   private final CommandXboxController m_driverController =
       new CommandXboxController(OIConstants.kDriverControllerPort);
@@ -42,9 +47,11 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // Start Limelight camera stream
 
     configureBindings();
+
+    // Build an auto chooser. Commands.none() is default option
+    autoChooser = AutoBuilder.buildAutoChooser();
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(
@@ -72,6 +79,8 @@ public class RobotContainer {
 
     SmartDashboard.putData("Feeder", m_launcher.runFeederCommand().withName("Launcher - Feeding and Launching"));
     SmartDashboard.putData("Flywheel", m_launcher.runFlywheelCommand().withName("Launcher - Spinning up Flywheel"));
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   /**
@@ -128,6 +137,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return Autos.exampleAuto(m_robotDrive);
+    return autoChooser.getSelected();
   }
 }
