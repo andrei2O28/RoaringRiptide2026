@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.MathUtil;
@@ -47,9 +48,12 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-
+    // Register Named Commands
+  NamedCommands.registerCommand("intake", m_intake.runIntakeCommand());
+  NamedCommands.registerCommand("outtake", m_intake.runOuttakeCommand());
+  NamedCommands.registerCommand("launch", m_launcher.runLauncherCommand());
+  
     configureBindings();
-
     // Build an auto chooser. Commands.none() is default option
     autoChooser = AutoBuilder.buildAutoChooser();
 
@@ -80,6 +84,7 @@ public class RobotContainer {
     SmartDashboard.putData("Feeder", m_launcher.runFeederCommand().withName("Launcher - Feeding and Launching"));
     SmartDashboard.putData("Flywheel", m_launcher.runFlywheelCommand().withName("Launcher - Spinning up Flywheel"));
 
+    
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
@@ -137,6 +142,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
+    // I am going to cry if this does not work
     return autoChooser.getSelected();
   }
 }
