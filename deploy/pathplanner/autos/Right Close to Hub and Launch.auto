@@ -21,6 +21,12 @@
           "data": {
             "pathName": "Mid to Hub"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "launch"
+          }
         }
       ]
     }
