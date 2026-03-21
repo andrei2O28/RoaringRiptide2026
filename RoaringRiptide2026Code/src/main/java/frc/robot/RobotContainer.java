@@ -51,7 +51,7 @@ public class RobotContainer {
     // Register Named Commands
   NamedCommands.registerCommand("intake", m_intake.runIntakeCommand());
   NamedCommands.registerCommand("outtake", m_intake.runOuttakeCommand());
-  NamedCommands.registerCommand("launch", m_launcher.runLauncherCommand());
+  NamedCommands.registerCommand("launch", m_launcher.runLauncherCommand().withTimeout(7.0));
   
     configureBindings();
     // Build an auto chooser. Commands.none() is default option
