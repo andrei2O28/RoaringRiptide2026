@@ -38,7 +38,7 @@ public final class Constants {
 
   public static final class VisionConstants {
     public static final String kLimelightName = "limelight-april";
-    public static final double kMinHubDistanceInches = 50.5/39.37008;
+    public static final double kMinHubDistanceInches = 51.3/39.37008;
   }
 
   public static final class LauncherSubsystemConstants {
@@ -152,7 +152,7 @@ public final class Constants {
         try {
           kRobotConfig = RobotConfig.fromGUISettings();
         } catch (Exception e) {
-          e.printStackTrace();
+          throw new RuntimeException("Pathplanner RobotConfig.guisettings failed",e);
       }
     }
   }

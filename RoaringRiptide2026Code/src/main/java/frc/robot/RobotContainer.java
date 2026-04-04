@@ -9,10 +9,12 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -51,11 +53,26 @@ public class RobotContainer {
     // Register Named Commands
   NamedCommands.registerCommand("intake", m_intake.runIntakeCommand());
   NamedCommands.registerCommand("outtake", m_intake.runOuttakeCommand());
-  NamedCommands.registerCommand("launch", m_launcher.runLauncherCommand().withTimeout(7.0));
+  NamedCommands.registerCommand("launch", m_launcher.runLauncherCommand()
+  .alongWith(m_intake.runConveyorCommand())
+  .withTimeout(7.0));
+  
+    if (Constants.PathPlannerConstants.kRobotConfig == null) {
+    SmartDashboard.putString("PathPlanner Config", "NULL");
+  } else {
+    SmartDashboard.putString("PathPlanner Config", "Loaded");
+  }
   
     configureBindings();
     // Build an auto chooser. Commands.none() is default option
+    try {
     autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putString("AutoBuilder", "Chooser built");
+  } catch (Throwable t) {
+    SmartDashboard.putString("AutoBuilder Crash", t.toString());
+    t.printStackTrace();
+    throw t;
+  }
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(
@@ -141,8 +158,16 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    // I am going to cry if this does not work
+  try {
+    SmartDashboard.putString("Auto Selected", autoChooser.getSelected().getName());
+
+    // TEMP TEST: force the simplest known auto
     return autoChooser.getSelected();
+    // return edu.wpi.first.wpilibj2.command.Commands.none();
+  } catch (Throwable t) {
+    DriverStation.reportError("Auto creation failed: " + t.getMessage(), t.getStackTrace());
+    SmartDashboard.putString("Auto Crash", t.toString());
+    return Commands.none();
   }
+}
 }

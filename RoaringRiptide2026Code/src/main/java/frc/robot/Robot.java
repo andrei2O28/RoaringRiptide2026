@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import java.util.jar.Attributes.Name;
 import java.util.spi.LocaleNameProvider;
 
 import edu.wpi.first.math.util.Units;
@@ -70,13 +71,31 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {}
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
+  // @Override
+  // public void autonomousInit() {
+  //   m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+
+  //   // schedule the autonomous command (example)
+  //   if (m_autonomousCommand != null) {
+  //     CommandScheduler.getInstance().schedule(m_autonomousCommand);
+  //   }
+  // }
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    try {
+      m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-    // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule(m_autonomousCommand);
+      SmartDashboard.putString("Auto Status", "Got autonomous command");
+
+      if (m_autonomousCommand != null) {
+        CommandScheduler.getInstance().schedule(m_autonomousCommand);
+        SmartDashboard.putString("Auto Status", "Autonomous scheduled");
+      } else {
+        SmartDashboard.putString("Auto Status", "Autonomous command is null");
+      }
+    } catch (Throwable t) {
+      SmartDashboard.putString("Auto Crash", t.toString());
+      t.printStackTrace();
     }
   }
 
@@ -123,6 +142,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    CameraServer.startAutomaticCapture();
+    CameraServer.startAutomaticCapture("cam-1",0);
+    CameraServer.startAutomaticCapture("cam-2",1);
   }
 }
