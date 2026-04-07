@@ -50,12 +50,12 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // Register Named Commands
+    // Register Named Commands (auto)
   NamedCommands.registerCommand("intake", m_intake.runIntakeCommand());
   NamedCommands.registerCommand("outtake", m_intake.runOuttakeCommand());
   NamedCommands.registerCommand("launch", m_launcher.runLauncherCommand()
   .alongWith(m_intake.runConveyorCommand())
-  .withTimeout(7.0));
+  .withTimeout(13.0));
   
     if (Constants.PathPlannerConstants.kRobotConfig == null) {
     SmartDashboard.putString("PathPlanner Config", "NULL");
