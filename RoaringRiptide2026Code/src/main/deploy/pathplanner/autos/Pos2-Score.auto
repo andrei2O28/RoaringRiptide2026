@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right Far to Mid"
+            "pathName": "Pos2-Mid"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Mid to Hub"
+            "pathName": "Mid-Hub"
           }
         },
         {

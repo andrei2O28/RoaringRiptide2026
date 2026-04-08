@@ -7,7 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "move forward from back to mid"
+            "pathName": "Pos4-Mid"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Mid-Hub"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "launch"
           }
         }
       ]
