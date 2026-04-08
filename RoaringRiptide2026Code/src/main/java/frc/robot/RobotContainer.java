@@ -37,6 +37,7 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
+    LimelightHelpers.SetFiducialIDFiltersOverride("limelight-april", new int[]{10, 26}); //Locked limelight to only read tags 10 and 26
     configureBindings();
 
     // Configure default commands
