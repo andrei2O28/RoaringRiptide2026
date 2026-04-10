@@ -56,6 +56,9 @@ public class RobotContainer {
   NamedCommands.registerCommand("launch", m_launcher.runLauncherCommand()
   .alongWith(m_intake.runConveyorCommand())
   .withTimeout(13.0));
+  NamedCommands.registerCommand("quick launch", m_launcher.runLauncherCommand()
+  .alongWith(m_intake.runConveyorCommand())
+  .withTimeout(6.5));
   
     if (Constants.PathPlannerConstants.kRobotConfig == null) {
     SmartDashboard.putString("PathPlanner Config", "NULL");
@@ -137,7 +140,7 @@ public class RobotContainer {
     // intake + conveyor to intake fuel efficiently (old L1 button)
     m_buttonBoard.button(5).toggleOnTrue(m_intake.runIntakeCommand());
     
-    // full launching mechanism (conveyor + launcher) (old L2 button)
+    // full launching mechanism (intake + conveyor + launcher) (old L2 button)
     m_buttonBoard.button(3)
     .toggleOnTrue(m_launcher.runLauncherCommand()
     .alongWith(m_intake.runConveyorCommand()));
