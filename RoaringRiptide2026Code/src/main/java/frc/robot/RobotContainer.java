@@ -53,12 +53,15 @@ public class RobotContainer {
     // Register Named Commands (auto)
   NamedCommands.registerCommand("intake", m_intake.runIntakeCommand());
   NamedCommands.registerCommand("outtake", m_intake.runOuttakeCommand());
-  NamedCommands.registerCommand("launch", m_launcher.runLauncherCommand()
+  NamedCommands.registerCommand("long launch", m_launcher.runLauncherCommand()
   .alongWith(m_intake.runConveyorCommand())
   .withTimeout(13.0));
   NamedCommands.registerCommand("quick launch", m_launcher.runLauncherCommand()
   .alongWith(m_intake.runConveyorCommand())
-  .withTimeout(6.5));
+  .withTimeout(7));
+  NamedCommands.registerCommand("medium launch", m_launcher.runLauncherCommand()
+  .alongWith(m_intake.runConveyorCommand())
+  .withTimeout(11));
   
     if (Constants.PathPlannerConstants.kRobotConfig == null) {
     SmartDashboard.putString("PathPlanner Config", "NULL");
@@ -121,20 +124,7 @@ public class RobotContainer {
     // xbox controller 🎮
     // Left Stick Button -> Set swerve to X
     m_driverController.leftStick().whileTrue(m_robotDrive.setXCommand());
-    
-    // Start Button -> Zero swerve heading
-    // needs to become button board
-
-    // Right Trigger -> Run fuel intake in reverse
-    // m_driverController
-    //   .rightTrigger(OIConstants.kTriggerButtonThreshold)
-    //   .whileTrue(m_intake.runIntakeCommand());
-
-    // Left Trigger -> Run fuel intake in reverse
-    // m_driverController
-    //   .leftTrigger(OIConstants.kTriggerButtonThreshold)
-    //   .whileTrue(m_intake.runOuttakeCommand());
-
+  
     // button board 😀
     
     // intake + conveyor to intake fuel efficiently (old L1 button)
@@ -166,7 +156,6 @@ public class RobotContainer {
 
     // TEMP TEST: force the simplest known auto
     return autoChooser.getSelected();
-    // return edu.wpi.first.wpilibj2.command.Commands.none();
   } catch (Throwable t) {
     DriverStation.reportError("Auto creation failed: " + t.getMessage(), t.getStackTrace());
     SmartDashboard.putString("Auto Crash", t.toString());

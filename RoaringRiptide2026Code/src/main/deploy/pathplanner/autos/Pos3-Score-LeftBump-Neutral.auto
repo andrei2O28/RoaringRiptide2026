@@ -17,7 +17,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "launch"
+                  "name": "quick launch"
                 }
               },
               {
@@ -27,7 +27,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 7.0
+                        "waitTime": 3.08
                       }
                     },
                     {

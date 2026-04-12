@@ -23,7 +23,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "launch"
+                  "name": "long launch"
                 }
               },
               {
@@ -33,7 +33,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 7.0
+                        "waitTime": 6.0
                       }
                     },
                     {

@@ -5,9 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "long launch"
+            "pathName": "Pos3-Mid"
           }
         }
       ]
