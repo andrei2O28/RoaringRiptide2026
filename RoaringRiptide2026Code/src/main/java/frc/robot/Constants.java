@@ -38,6 +38,7 @@ public final class Constants {
 
   public static final class VisionConstants {
     public static final String kLimelightName = "limelight-april";
+    // converts from meters to inches, controls distance to stop moving forward when too close to hub
     public static final double kMinHubDistanceInches = 51.3/39.37008;
   }
 
@@ -152,7 +153,7 @@ public final class Constants {
         try {
           kRobotConfig = RobotConfig.fromGUISettings();
         } catch (Exception e) {
-          throw new RuntimeException("Pathplanner RobotConfig.guisettings failed",e);
+          throw new RuntimeException("Pathplanner RobotConfig.guisettings failed", e);
       }
     }
   }

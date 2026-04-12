@@ -57,13 +57,13 @@ public class RobotContainer {
   NamedCommands.registerCommand("long launch", m_launcher.runLauncherCommand()
   .alongWith(m_intake.runConveyorCommand())
   .withTimeout(13.0));
-  NamedCommands.registerCommand("quick launch", m_launcher.runLauncherCommand()
-  .alongWith(m_intake.runConveyorCommand())
-  .withTimeout(7));
   NamedCommands.registerCommand("medium launch", m_launcher.runLauncherCommand()
   .alongWith(m_intake.runConveyorCommand())
   .withTimeout(11));
-  
+  NamedCommands.registerCommand("quick launch", m_launcher.runLauncherCommand()
+  .alongWith(m_intake.runConveyorCommand())
+  .withTimeout(7));
+
     if (Constants.PathPlannerConstants.kRobotConfig == null) {
     SmartDashboard.putString("PathPlanner Config", "NULL");
   } else {
@@ -74,7 +74,7 @@ public class RobotContainer {
     // Build an auto chooser. Commands.none() is default option
     try {
     autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putString("AutoBuilder", "Chooser built");
+    SmartDashboard.putString("AutoBuilder", "Auto Chooser built");
   } catch (Throwable t) {
     SmartDashboard.putString("AutoBuilder Crash", t.toString());
     t.printStackTrace();
@@ -126,6 +126,27 @@ public class RobotContainer {
     // Left Stick Button -> Set swerve to X
     m_driverController.leftStick().whileTrue(m_robotDrive.setXCommand());
   
+    // D-pad robot centric movement
+    m_driverController.povUp().whileTrue(new RunCommand(
+        () -> m_robotDrive.drive(0.15, 0, 0, false),
+        m_robotDrive
+    ).withName("Robot Centric Forward"));
+
+    m_driverController.povDown().whileTrue(new RunCommand(
+        () -> m_robotDrive.drive(-0.15, 0, 0, false),
+        m_robotDrive
+    ).withName("Robot Centric Backward"));
+
+    m_driverController.povLeft().whileTrue(new RunCommand(
+        () -> m_robotDrive.drive(0, 0.15, 0, false),
+        m_robotDrive
+    ).withName("Robot Centric Left"));
+
+    m_driverController.povRight().whileTrue(new RunCommand(
+        () -> m_robotDrive.drive(0, -0.15, 0, false),
+        m_robotDrive
+    ).withName("Robot Centric Right"));
+
     // button board 😀
     
     // intake + conveyor to intake fuel efficiently (old L1 button)
