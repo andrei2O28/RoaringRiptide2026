@@ -51,7 +51,8 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Register Named Commands (auto)
-  NamedCommands.registerCommand("intake", m_intake.runIntakeCommand());
+  NamedCommands.registerCommand("intake", m_intake.runIntakeCommand()
+  .withTimeout(5.0));
   NamedCommands.registerCommand("outtake", m_intake.runOuttakeCommand());
   NamedCommands.registerCommand("long launch", m_launcher.runLauncherCommand()
   .alongWith(m_intake.runConveyorCommand())

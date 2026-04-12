@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.6,
-        "y": 5.3
+        "x": 0.4824784946236568,
+        "y": 5.375994623655916
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.162261637803467,
-        "y": 4.7783237342359755
+        "x": 1.4824784946236567,
+        "y": 5.375994623655916
       },
       "isLocked": false,
-      "linkedName": "Pos2"
+      "linkedName": "RightOfDepot"
     },
     {
       "anchor": {
-        "x": 2.995,
+        "x": 3.195,
         "y": 4.025
       },
       "prevControl": {
-        "x": 3.155696902421635,
-        "y": 4.216511110779745
+        "x": 2.195,
+        "y": 4.025
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Mid"
+      "linkedName": "Hub"
     }
   ],
   "rotationTargets": [],
@@ -48,7 +48,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.29450011362316353
+    "rotation": -89.53037298031035
   },
   "useDefaultConstraints": true
 }
