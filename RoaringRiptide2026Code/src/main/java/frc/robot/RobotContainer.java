@@ -70,7 +70,7 @@ public class RobotContainer {
     SmartDashboard.putString("PathPlanner Config", "Loaded");
   }
   
-    configureBindings();
+    configureBindings();  
     // Build an auto chooser. Commands.none() is default option
     try {
     autoChooser = AutoBuilder.buildAutoChooser();
